@@ -39,12 +39,12 @@ if uploaded_file is not None:
         st.write("📊 통합국사별 DUH_SFP 고온 수량 Report (60˚C 이상인 SFP가 2개 이상인 경우) :")
         st.write(report_df)
 
-        # site_name을 요약하여 짧은 형태로 표시 (예: '서울-01'처럼 '-' 이전의 첫 단어만 표시)
-        report_df['short_name'] = report_df['site_name'].str.split('-').str[0] + '-' + report_df['site_name'].str.split('-').str[1]
+        # site_name을 요약하여 더 짧은 형태로 표시 (예: '서울-01'처럼 '-' 앞의 두 단어로 축약)
+        report_df['short_name'] = report_df['site_name'].apply(lambda x: '-'.join(x.split('-')[:2]))
 
         # Altair 그래프 생성 (short_name 표시, 전체 이름은 툴팁으로 표시)
         chart = alt.Chart(report_df).mark_bar().encode(
-            x=alt.X('short_name:N', title='Site Name (Short)', axis=alt.Axis(labelAngle=-45)),  # 축약된 site_name 표시
+            x=alt.X('short_name:N', title='Site Name (Short)', axis=alt.Axis(labelAngle=-45, tickMinStep=1)),  # 축약된 site_name 표시, 레이블 회전
             y=alt.Y('high temp(60˚C 이상):Q', title='High Temp (60˚C 이상) 수량'),
             tooltip=['site_name', 'high temp(60˚C 이상)']  # 마우스를 올리면 전체 이름 표시
         ).properties(
@@ -85,6 +85,7 @@ if uploaded_file is not None:
             )
     else:
         st.write("region, site_name, 또는 temp1 열을 찾을 수 없습니다.")
+
 
 
 
