@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import io
+import altair as alt
 
 # 타이틀과 안내 메시지
 st.title("🎈 통합국 DUH_SFP 고온 Report ")
@@ -31,13 +31,27 @@ if uploaded_file is not None:
     # temp1이 60 이상인 행의 수를 카운트하여 리포트 생성
     if 'region' in df.columns and 'site_name' in df.columns and 'temp1' in df.columns:
         report_df = df[df['temp1'] >= 60].groupby(['region', 'site_name']).size().reset_index(name="high temp(60˚C 이상)")
-        
+
         # high temp(60˚C 이상) 열의 값이 2 이상인 경우만 필터링
         report_df = report_df[report_df["high temp(60˚C 이상)"] >= 2]
         
         # 리포트 출력
         st.write("📊 통합국사별 DUH_SFP 고온 수량 Report (60˚C 이상인 SFP가 2개 이상인 경우) :")
         st.write(report_df)
+
+        # 그래프 추가
+        report_df['short_name'] = report_df['site_name'].str.split('-').str[0] + '-'  # site_name을 xx-로 축약
+
+        # Altair 그래프 생성
+        chart = alt.Chart(report_df).mark_bar().encode(
+            x=alt.X('short_name:N', title='Site Name'),
+            y=alt.Y('high temp(60˚C 이상):Q', title='High Temp (60˚C 이상)'),
+            tooltip=['site_name', 'high temp(60˚C 이상)']  # 마우스를 올리면 full name 표시
+        ).properties(
+            title="통합국사별 DUH_SFP 고온 수량"
+        )
+
+        st.altair_chart(chart, use_container_width=True)
 
         # site_name 선택
         st.markdown("<b style='color: blue;'>고온 상세현황을 알고 싶으면 통합국사명(site_name)을 선택하세요</b>", unsafe_allow_html=True)
@@ -69,3 +83,4 @@ if uploaded_file is not None:
             )
     else:
         st.write("region, site_name, 또는 temp1 열을 찾을 수 없습니다.")
+
