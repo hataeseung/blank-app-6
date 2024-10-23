@@ -3,9 +3,21 @@ import pandas as pd
 import altair as alt
 
 # 타이틀과 안내 메시지
-st.title("🎈 통합국 DUH_SFP 고온 Report ")
+st.title("🏢 통합국사 DUH_SFP 고온 Report ")
 st.write(
     "업로드된 데이터를 기반으로 통합국사별 60˚C 이상 고온 DUH_SFP 수량을 보여줍니다."
+)
+
+# 이모지를 건물 오른쪽에 온도계가 있도록 배치
+st.write("통합국 건물의 온도가 높아지고 있습니다. 온도 모니터링을 진행 중입니다.")
+st.markdown(
+    """
+    <div style='display: flex; justify-content: center; align-items: center;'>
+        <span style='font-size: 80px;'>🏢</span>
+        <span style='font-size: 80px; margin-left: 10px;'>🌡️</span>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
 # 파일 업로드 위젯
@@ -85,6 +97,9 @@ if uploaded_file is not None:
             )
     else:
         st.write("region, site_name, 또는 temp1 열을 찾을 수 없습니다.")
+
+
+
 
 
 
