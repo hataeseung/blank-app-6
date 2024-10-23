@@ -44,7 +44,7 @@ if uploaded_file is not None:
 
         # Altair 그래프 생성 (short_name 표시, 전체 이름은 툴팁으로 표시)
         chart = alt.Chart(report_df).mark_bar().encode(
-            x=alt.X('short_name:N', title='Site Name (Short)', axis=alt.Axis(labelAngle=-45, tickCount=len(report_df['short_name']))),  # tickCount로 모든 레이블 표시
+            x=alt.X('short_name:N', title='Site Name (Short)', axis=alt.Axis(labelAngle=-45, tickMinStep=1, labelOverlap=False)),  # 레이블 회전 및 겹침 방지
             y=alt.Y('high temp(60˚C 이상):Q', title='High Temp (60˚C 이상) 수량'),
             tooltip=['site_name', 'high temp(60˚C 이상)']  # 마우스를 올리면 전체 이름 표시
         ).properties(
@@ -85,6 +85,7 @@ if uploaded_file is not None:
             )
     else:
         st.write("region, site_name, 또는 temp1 열을 찾을 수 없습니다.")
+
 
 
 
