@@ -44,14 +44,14 @@ if uploaded_file is not None:
 
         # Altair 그래프 생성
         chart = alt.Chart(report_df).mark_bar().encode(
-            x=alt.X('short_name:N', title='Site Name'),
-            y=alt.Y('high temp(60˚C 이상):Q', title='High Temp (60˚C 이상)'),
-            tooltip=['site_name', 'high temp(60˚C 이상)']  # 마우스를 올리면 full name 표시
+        x=alt.X('short_name:N', title='Site Name', axis=alt.Axis(labelAngle=-45)),  # 레이블 회전
+        y=alt.Y('high temp(60˚C 이상):Q', title='High Temp (60˚C 이상)'),
+        tooltip=['site_name', 'high temp(60˚C 이상)']  # 마우스를 올리면 full name 표시
         ).properties(
-            title="통합국사별 DUH_SFP 고온 수량"
+        title="통합국사별 DUH_SFP 고온 수량"
         )
 
-        st.altair_chart(chart, use_container_width=True)
+st.altair_chart(chart, use_container_width=True)
 
         # site_name 선택
         st.markdown("<b style='color: blue;'>고온 상세현황을 알고 싶으면 통합국사명(site_name)을 선택하세요</b>", unsafe_allow_html=True)
@@ -83,4 +83,6 @@ if uploaded_file is not None:
             )
     else:
         st.write("region, site_name, 또는 temp1 열을 찾을 수 없습니다.")
+
+
 
