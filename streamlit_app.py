@@ -56,8 +56,8 @@ if uploaded_file is not None:
     st.write(df.head())
 
     # temp1이 60 이상인 행의 수를 카운트하여 리포트 생성
-    if 'region' in df.columns and 'site_name' in df.columns and 'temp1' in df.columns:
-        report_df = df[df['temp1'] >= 60].groupby(['region', 'site_name']).size().reset_index(name="high temp(60˚C 이상)")
+    if 'region' in df.columns and 'site_name' in df.columns and 'temp1' in df.columns and 'duh_name' in df.columns:
+        report_df = df[df['temp1'] >= 60].groupby(['region', 'site_name', 'duh_name']).size().reset_index(name="high temp(60˚C 이상)")
 
         # high temp(60˚C 이상) 열의 값이 2 이상인 경우만 필터링
         report_df = report_df[report_df["high temp(60˚C 이상)"] >= 2]
@@ -110,20 +110,15 @@ if uploaded_file is not None:
                 file_name=f"{selected_site}_고온_SFP_List.csv",
                 mime="text/csv"
             )
+
+            # 해결방안 제안 문구 추가
+            st.markdown("<b style='color: red;'>고온 사전조치 해결방안 제안 :</b>", unsafe_allow_html=True)
+
+            # duh_name에 따른 해결방안 제시
+            solution_df = filtered_df.groupby('duh_name').size().reset_index(name="고온 SFP 수")
+            solution_df['해결방안'] = solution_df['고온 SFP 수'].apply(lambda x: 'SFP 불량 점검' if x == 1 else '냉방시설 점검 및 설치상면 조정')
+
+            # 해결방안 테이블 출력
+            st.write(solution_df)
     else:
         st.write("region, site_name, 또는 temp1 열을 찾을 수 없습니다.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
