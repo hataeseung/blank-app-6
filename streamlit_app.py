@@ -53,18 +53,18 @@ if uploaded_file is not None:
 
     # 데이터의 처음 5줄을 미리보기 (dt 열 형식 적용)
     st.write("📊 업로드 데이터 미리보기 :")
-    st.write(df.head())
+    st.dataframe(df.head(), use_container_width=True)
 
     # temp1이 60 이상인 행의 수를 카운트하여 리포트 생성
-    if 'region' in df.columns and 'site_name' in df.columns and 'temp1' in df.columns and 'duh_name' in df.columns:
-        report_df = df[df['temp1'] >= 60].groupby(['region', 'site_name', 'duh_name']).size().reset_index(name="high temp(60˚C 이상)")
+    if 'region' in df.columns and 'site_name' in df.columns and 'temp1' in df.columns:
+        report_df = df[df['temp1'] >= 60].groupby(['region', 'site_name']).size().reset_index(name="high temp(60˚C 이상)")
 
-        # high temp(60˚C 이상) 열의 값이 2 이상인 경우만 필터링
-        report_df = report_df[report_df["high temp(60˚C 이상)"] >= 2]
+        # high temp(60˚C 이상) 열의 값이 1 이상인 경우만 필터링
+        report_df = report_df[report_df["high temp(60˚C 이상)"] >= 1]
         
         # 리포트 출력
-        st.write("📊 통합국사별 DUH_SFP 고온 수량 Report (60˚C 이상인 SFP가 2개 이상인 경우) :")
-        st.write(report_df)
+        st.write("📊 통합국사별 DUH_SFP 고온 수량 Report (60˚C 이상인 SFP가 1개 이상인 경우) :")
+        st.dataframe(report_df, use_container_width=True)
 
         # site_name을 요약하여 더 짧은 형태로 표시 (예: '서울-01'처럼 '-' 앞의 두 단어로 축약)
         report_df['short_name'] = report_df['site_name'].apply(lambda x: '-'.join(x.split('-')[:2]))
@@ -91,16 +91,8 @@ if uploaded_file is not None:
             filtered_df = df[(df['site_name'] == selected_site) & (df['temp1'] >= 60)]
             
             # 테이블 크기 및 열 중앙 정렬을 위한 스타일 적용
-            styled_df = filtered_df.style.set_table_styles(
-                [{'selector': 'th', 'props': [('text-align', 'center')]},  # 헤더 중앙 정렬
-                 {'selector': 'td', 'props': [('text-align', 'center')]}]  # 데이터 중앙 정렬
-            ).set_properties(**{
-                'width': 'auto',  # 텍스트 길이에 맞춰 자동 조정
-            })
-            
-            # 스타일 적용된 테이블 출력
             st.write(f"📊 {selected_site}의 고온 상세현황 (60˚C 이상 DUH_SFP List) :")
-            st.dataframe(styled_df)
+            st.dataframe(filtered_df, use_container_width=True)
 
             # CSV 다운로드 버튼 생성
             csv = filtered_df.to_csv(index=False).encode('utf-8')
@@ -114,11 +106,19 @@ if uploaded_file is not None:
             # 해결방안 제안 문구 추가
             st.markdown("<b style='color: red;'>고온 사전조치 해결방안 제안 :</b>", unsafe_allow_html=True)
 
-            # duh_name에 따른 해결방안 제시
-            solution_df = filtered_df.groupby('duh_name').size().reset_index(name="고온 SFP 수")
-            solution_df['해결방안'] = solution_df['고온 SFP 수'].apply(lambda x: 'SFP 불량 점검' if x == 1 else '냉방시설 점검 및 설치상면 조정')
+            # site_name별 고온 SFP 수 합계 계산
+            duh_high_temp_counts = filtered_df.groupby('duh_name').size().reset_index(name="고온 SFP 수")
+
+            if duh_high_temp_counts['고온 SFP 수'].sum() >= 3:
+                # 통합국사 전체 DUH에 대해 해결방안을 "냉방시설 점검 및 설치상면 조정"으로 설정
+                solution_df = duh_high_temp_counts.copy()
+                solution_df['해결방안'] = "냉방시설 점검 및 설치상면 조정"
+            else:
+                # duh_name에 따른 해결방안 제시
+                solution_df = duh_high_temp_counts.copy()
+                solution_df['해결방안'] = solution_df['고온 SFP 수'].apply(lambda x: 'SFP 불량 점검' if x == 1 else '냉방시설 점검 및 설치상면 조정')
 
             # 해결방안 테이블 출력
-            st.write(solution_df)
+            st.dataframe(solution_df, use_container_width=True)
     else:
         st.write("region, site_name, 또는 temp1 열을 찾을 수 없습니다.")
