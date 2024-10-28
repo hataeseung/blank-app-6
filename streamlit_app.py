@@ -52,7 +52,7 @@ if uploaded_file is not None:
     df['temp1'] = pd.to_numeric(df['temp1'], errors='coerce').fillna(0).astype(int)  # NaN을 0으로 대체한 후 정수 변환
 
     # 데이터의 처음 5줄을 미리보기 (dt 열 형식 적용)
-    st.write("📊 업로드 데이터 미리보기 :")
+    st.write("🔍 업로드 데이터 미리보기 :")
     st.dataframe(df.head(), use_container_width=True)
 
     # temp1이 60 이상인 행의 수를 카운트하여 리포트 생성
@@ -63,7 +63,7 @@ if uploaded_file is not None:
         report_df = report_df[report_df["high temp(60˚C 이상)"] >= 1]
         
         # 리포트 출력
-        st.write("📊 통합국사별 DUH_SFP 고온 수량 Report (60˚C 이상인 SFP가 1개 이상인 경우) :")
+        st.write("📝 통합국사별 DUH_SFP 고온 수량 Report (60˚C 이상인 SFP가 1개 이상인 경우) :")
         st.dataframe(report_df, use_container_width=True)
 
         # site_name을 요약하여 더 짧은 형태로 표시 (예: '서울-01'처럼 '-' 앞의 두 단어로 축약)
@@ -75,7 +75,7 @@ if uploaded_file is not None:
             y=alt.Y('high temp(60˚C 이상):Q', title='High Temp (60˚C 이상) 수량'),
             tooltip=['site_name', 'high temp(60˚C 이상)']  # 마우스를 올리면 전체 이름 표시
         ).properties(
-            title="통합국사별 DUH_SFP 고온 수량"
+            title="📊 통합국사별 DUH_SFP 고온 수량 (그래프)" 
         ).configure_axis(
             labelFontSize=12  # 축 레이블 크기 설정
         )
@@ -83,7 +83,7 @@ if uploaded_file is not None:
         st.altair_chart(chart, use_container_width=True)
 
         # site_name 선택
-        st.markdown("<b style='color: blue;'>고온 상세현황을 알고 싶으면 통합국사명(site_name)을 선택하세요</b>", unsafe_allow_html=True)
+        st.markdown("<b style='color: blue;'>고온 상세현황을 알고 싶으면 통합국사명(site_name)을 선택하세요 🔽</b>", unsafe_allow_html=True)
         selected_site = st.selectbox("", report_df['site_name'].unique())
         
         # 선택한 site_name에 해당하는 행을 출력
@@ -104,7 +104,7 @@ if uploaded_file is not None:
             )
 
             # 해결방안 제안 문구 추가
-            st.markdown("<b style='color: red;'>고온 사전조치 해결방안 제안 :</b>", unsafe_allow_html=True)
+            st.markdown("<b style='color: red;'>👉 고온 사전조치 해결방안 제안 :</b>", unsafe_allow_html=True)
 
             # site_name별 고온 SFP 수 합계 계산
             duh_high_temp_counts = filtered_df.groupby('duh_name').size().reset_index(name="고온 SFP 수")
