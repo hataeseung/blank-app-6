@@ -19,7 +19,7 @@ st.markdown(
 st.markdown(
     """
     <div style='text-align: center; color: red;'>
-        통합국사 담당자께서는 사전조치 부탁드립니다.
+        통합국사 담당자께서는 조치 부탁드립니다.
     </div>
     """, 
     unsafe_allow_html=True
@@ -104,7 +104,7 @@ if uploaded_file is not None:
             )
 
             # 해결방안 제안 문구 추가
-            st.markdown("<b style='color: red;'>👉 고온 사전조치 해결방안 제안 :</b>", unsafe_allow_html=True)
+            st.markdown("<b style='color: red;'>👉👉👉 고온 해결방안 제안 :</b>", unsafe_allow_html=True)
 
             # site_name별 고온 SFP 수 합계 계산
             duh_high_temp_counts = filtered_df.groupby('duh_name').size().reset_index(name="고온 SFP 수")
