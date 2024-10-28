@@ -9,7 +9,7 @@ st.title("🎈 통합국사 DUH_SFP 고온 Report ")
 st.markdown(
     """
     <div style='text-align: center;'>
-        업로드된 데이터를 기반으로 통합국사별 60˚C 이상 고온 DUH_SFP 수량을 보여줍니다.
+        업로드된 데이터를 기반으로 통합국사별 60˚C 이상 고온 DUH_SFP 현황을 보여줍니다.
     </div>
     """, 
     unsafe_allow_html=True
@@ -62,8 +62,8 @@ if uploaded_file is not None:
         # high temp(60˚C 이상) 열의 값이 1 이상인 경우만 필터링
         report_df = report_df[report_df["high temp(60˚C 이상)"] >= 1]
         
-        # 리포트 출력
-        st.write("📝 통합국사별 DUH_SFP 고온 수량 Report (60˚C 이상인 SFP가 1개 이상인 경우) :")
+        # 리포트 출력 (굵은 글씨체로 변경)
+        st.markdown("**📝 통합국사별 DUH_SFP 고온 수량 Report (60˚C 이상인 SFP가 1개 이상인 경우) :**")
         st.dataframe(report_df, use_container_width=True)
 
         # site_name을 요약하여 더 짧은 형태로 표시 (예: '서울-01'처럼 '-' 앞의 두 단어로 축약)
@@ -90,8 +90,8 @@ if uploaded_file is not None:
         if selected_site:
             filtered_df = df[(df['site_name'] == selected_site) & (df['temp1'] >= 60)]
             
-            # 테이블 크기 및 열 중앙 정렬을 위한 스타일 적용
-            st.write(f"📊 {selected_site}의 고온 상세현황 (60˚C 이상 DUH_SFP List) :")
+            # 테이블 크기 및 열 중앙 정렬을 위한 스타일 적용 (굵은 글씨체로 변경)
+            st.markdown(f"**📊 {selected_site}의 고온 상세현황 (60˚C 이상 DUH_SFP List) :**")
             st.dataframe(filtered_df, use_container_width=True)
 
             # CSV 다운로드 버튼 생성
