@@ -53,7 +53,10 @@ if uploaded_file is not None:
 
     # 데이터의 처음 5줄을 미리보기 (dt 열 형식 적용)
     st.write("🔍 업로드 데이터 미리보기 :")
-    st.dataframe(df.head().style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+    st.write(
+        df.head().to_html(index=False, justify='center'), 
+        unsafe_allow_html=True
+    )
 
     # temp1이 60 이상인 행의 수를 카운트하여 리포트 생성
     if 'region' in df.columns and 'site_name' in df.columns and 'temp1' in df.columns:
@@ -71,7 +74,10 @@ if uploaded_file is not None:
 
         # 리포트 출력 (굵은 글씨체로 변경)
         st.markdown("**📝 통합국사별 DUH_SFP 고온 수량 Report (60˚C 이상인 SFP가 1개 이상인 경우) :**")
-        st.dataframe(report_df.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+        st.write(
+            report_df.to_html(index=False, justify='center'), 
+            unsafe_allow_html=True
+        )
 
         # site_name을 요약하여 더 짧은 형태로 표시 (예: '서울-01'처럼 '-' 앞의 두 단어로 축약)
         report_df['short_name'] = report_df['국사명'].apply(lambda x: '-'.join(x.split('-')[:2]))
@@ -107,7 +113,10 @@ if uploaded_file is not None:
 
             # 테이블 크기 및 열 중앙 정렬을 위한 스타일 적용 (굵은 글씨체로 변경)
             st.markdown(f"**📊 {selected_site}의 고온 상세현황 (60˚C 이상 DUH_SFP List) :**")
-            st.dataframe(filtered_df.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+            st.write(
+                filtered_df.to_html(index=False, justify='center'), 
+                unsafe_allow_html=True
+            )
 
             # CSV 다운로드 버튼 생성
             csv = filtered_df.to_csv(index=False).encode('utf-8')
@@ -134,6 +143,9 @@ if uploaded_file is not None:
                 solution_df['해결방안'] = solution_df['고온 SFP 수'].apply(lambda x: 'SFP 불량 점검' if x == 1 else '냉방시설 점검 및 설치상면 조정')
 
             # 해결방안 테이블 출력
-            st.dataframe(solution_df.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
+            st.write(
+                solution_df.to_html(index=False, justify='center'), 
+                unsafe_allow_html=True
+            )
     else:
         st.write("region, site_name, 또는 temp1 열을 찾을 수 없습니다.")
