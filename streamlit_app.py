@@ -53,7 +53,7 @@ if uploaded_file is not None:
 
     # 데이터의 처음 5줄을 미리보기 (dt 열 형식 적용)
     st.write("🔍 업로드 데이터 미리보기 :")
-    st.dataframe(df.head(), use_container_width=True)
+    st.dataframe(df.head().style.set_properties(**{'text-align': 'center'}), use_container_width=True)
 
     # temp1이 60 이상인 행의 수를 카운트하여 리포트 생성
     if 'region' in df.columns and 'site_name' in df.columns and 'temp1' in df.columns:
@@ -62,18 +62,25 @@ if uploaded_file is not None:
         # high temp(60˚C 이상) 열의 값이 1 이상인 경우만 필터링
         report_df = report_df[report_df["high temp(60˚C 이상)"] >= 1]
         
+        # 열 이름을 사용자가 지정한 대로 수정
+        report_df.rename(columns={
+            'region': '지역',
+            'site_name': '국사명',
+            'high temp(60˚C 이상)': '고온(60˚C 이상) SFP 수량'
+        }, inplace=True)
+
         # 리포트 출력 (굵은 글씨체로 변경)
         st.markdown("**📝 통합국사별 DUH_SFP 고온 수량 Report (60˚C 이상인 SFP가 1개 이상인 경우) :**")
-        st.dataframe(report_df, use_container_width=True)
+        st.dataframe(report_df.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
 
         # site_name을 요약하여 더 짧은 형태로 표시 (예: '서울-01'처럼 '-' 앞의 두 단어로 축약)
-        report_df['short_name'] = report_df['site_name'].apply(lambda x: '-'.join(x.split('-')[:2]))
+        report_df['short_name'] = report_df['국사명'].apply(lambda x: '-'.join(x.split('-')[:2]))
 
         # Altair 그래프 생성 (short_name 표시, 전체 이름은 툴팁으로 표시)
         chart = alt.Chart(report_df).mark_bar().encode(
             x=alt.X('short_name:N', title='Site Name (Short)', axis=alt.Axis(labelAngle=-45, tickMinStep=1, labelOverlap=False)),  # 레이블 회전 및 겹침 방지
-            y=alt.Y('high temp(60˚C 이상):Q', title='High Temp (60˚C 이상) 수량'),
-            tooltip=['site_name', 'high temp(60˚C 이상)']  # 마우스를 올리면 전체 이름 표시
+            y=alt.Y('고온(60˚C 이상) SFP 수량:Q', title='High Temp (60˚C 이상) 수량'),
+            tooltip=['국사명', '고온(60˚C 이상) SFP 수량']  # 마우스를 올리면 전체 이름 표시
         ).properties(
             title="📊 통합국사별 DUH_SFP 고온 수량 (그래프)" 
         ).configure_axis(
@@ -84,15 +91,23 @@ if uploaded_file is not None:
 
         # site_name 선택
         st.markdown("<b style='color: blue;'>고온 상세현황을 알고 싶으면 통합국사명(site_name)을 선택하세요 🔽</b>", unsafe_allow_html=True)
-        selected_site = st.selectbox("", report_df['site_name'].unique())
+        selected_site = st.selectbox("", report_df['국사명'].unique())
         
         # 선택한 site_name에 해당하는 행을 출력
         if selected_site:
             filtered_df = df[(df['site_name'] == selected_site) & (df['temp1'] >= 60)]
             
+            # 열 이름을 사용자가 지정한 대로 수정
+            filtered_df.rename(columns={
+                'region': '지역',
+                'site_name': '국사명',
+                'duh_name': 'DUH명',
+                'temp1': 'SFP온도'
+            }, inplace=True)
+
             # 테이블 크기 및 열 중앙 정렬을 위한 스타일 적용 (굵은 글씨체로 변경)
             st.markdown(f"**📊 {selected_site}의 고온 상세현황 (60˚C 이상 DUH_SFP List) :**")
-            st.dataframe(filtered_df, use_container_width=True)
+            st.dataframe(filtered_df.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
 
             # CSV 다운로드 버튼 생성
             csv = filtered_df.to_csv(index=False).encode('utf-8')
@@ -107,18 +122,18 @@ if uploaded_file is not None:
             st.markdown("<b style='color: red;'>👉👉👉 고온 해결방안 제안 :</b>", unsafe_allow_html=True)
 
             # site_name별 고온 SFP 수 합계 계산
-            duh_high_temp_counts = filtered_df.groupby('duh_name').size().reset_index(name="고온 SFP 수")
+            duh_high_temp_counts = filtered_df.groupby('DUH명').size().reset_index(name="고온 SFP 수")
 
             if duh_high_temp_counts['고온 SFP 수'].sum() >= 3:
                 # 통합국사 전체 DUH에 대해 해결방안을 "냉방시설 점검 및 설치상면 조정"으로 설정
                 solution_df = duh_high_temp_counts.copy()
                 solution_df['해결방안'] = "냉방시설 점검 및 설치상면 조정"
             else:
-                # duh_name에 따른 해결방안 제시
+                # DUH명에 따른 해결방안 제시
                 solution_df = duh_high_temp_counts.copy()
                 solution_df['해결방안'] = solution_df['고온 SFP 수'].apply(lambda x: 'SFP 불량 점검' if x == 1 else '냉방시설 점검 및 설치상면 조정')
 
             # 해결방안 테이블 출력
-            st.dataframe(solution_df, use_container_width=True)
+            st.dataframe(solution_df.style.set_properties(**{'text-align': 'center'}), use_container_width=True)
     else:
         st.write("region, site_name, 또는 temp1 열을 찾을 수 없습니다.")
